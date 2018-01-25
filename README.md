@@ -7,17 +7,18 @@ The following image (taken from IAM dataset \[2]) shows input (left) and output 
 ## Getting started
 Build on Linux:
 ```g++ --std=c++11 main.cpp DeslantImg.cpp -o DeslantImg `pkg-config --cflags --libs opencv` ```
+
 And run:
 ```./DeslantImg```
-This should read the image ```data/test.png``` and output the deslanted image ```out.png```.
 
+This should read the image ```data/test.png``` and output the deslanted image ```out.png```.
 Implemented in C++ using OpenCV3.
 Tested on Windows and Linux using the IAM, Bentham and Ratsprotokolle datasets.
 
 
 ## Algorithm 
 Vinciarelli and Luettin describe the algorithm in their paper \[1].
-Here a short outline of the algorithm:
+Here is a short outline of the algorithm:
 ![algo](./doc/algo.png)
 
 
@@ -28,7 +29,7 @@ It returns the deslanted image.
 The following code reads an image, deslants it and finally saves it (see ```main.cpp```):
 ```
 // read grayscale image
-cv::Mat img = cv::imread("data/test.png", cv::IMREAD_GRAYSCALE);
+const cv::Mat img = cv::imread("data/test.png", cv::IMREAD_GRAYSCALE);
 
 // deslant it
 cv::Mat res = deslantImg(img, 255);
