@@ -1,5 +1,6 @@
 # Deslanting Algorithm
 This algorithm sets the (handwritten) text in images upright, i.e. it removes the cursive writing style.
+It can be used as a preprocessing step in handwritten text recognition.
 The following image (taken from IAM dataset \[2]) shows input (left) and output (right) of the algorithm for the test file (```data/test.png```).
 ![deslanting](./doc/deslanting.png)
 
