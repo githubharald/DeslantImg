@@ -10,7 +10,7 @@ The following illustration shows input and output of the algorithm for a given i
 
 Two implementations are provided:
 * CPU: all computations are done on the CPU using OpenCV.
-* GPU: each column and shear angle is processed in parallel using OpenCL to calculate the best shear angle, the remaining work is done on the CPU using OpenCV.
+* GPU: each column and shear angle is processed in parallel using OpenCL to calculate the optimal shear angle, the remaining work is done on the CPU using OpenCV.
 
 
 ## Getting started
@@ -18,18 +18,14 @@ Two implementations are provided:
 Build **CPU** implementation on Linux (OpenCV must be installed):
 ```g++ --std=c++11 src/cpp/main.cpp src/cpp/DeslantImgCPU.cpp `pkg-config --cflags --libs opencv` -o DeslantImg ```
 
-Build **CPU and GPU** implementation on Linux (OpenCV and OpenGL must be installed). 
-If the macro **USE_GPU** is defined in main.cpp, the computation takes place on the GPU:
-```g++ --std=c++11 src/cpp/main.cpp src/cpp/DeslantImgCPU.cpp src/cpp/DeslantImgGPU.cpp src/cpp/CLWrapper.cpp `pkg-config --cflags --libs opencv` -lOpenCL -o DeslantImg```
 
+If the macro **USE_GPU** is defined in ```main.cpp```, the computation takes place on the GPU.
+Build **CPU and GPU** implementation on Linux (OpenCV and OpenGL must be installed):
+```g++ --std=c++11 src/cpp/main.cpp src/cpp/DeslantImgCPU.cpp src/cpp/DeslantImgGPU.cpp src/cpp/CLWrapper.cpp `pkg-config --cflags --libs opencv` -lOpenCL -o DeslantImg```
 
 
 Deslant the two images provided in the ```data/``` directory (taken from IAM dataset \[2\]) and write output to the root directory of the repository:
 ```./DeslantImg```
-
-This reads the image ```data/test.png``` and outputs the deslanted image ```out.png```.
-Implemented in C++ using OpenCV3.
-Tested on Windows and Linux using the IAM, Bentham and Ratsprotokolle datasets.
 
 
 ## Documentation
