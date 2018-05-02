@@ -1,5 +1,5 @@
 // uncomment next line to use GPU via OpenCL
-#define USE_GPU
+//#define USE_GPU
 
 
 #ifdef USE_GPU
