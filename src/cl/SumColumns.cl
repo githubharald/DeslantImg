@@ -1,20 +1,15 @@
-// sampler for image
-__constant sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP | CLK_FILTER_NEAREST;
-
-
 // kernel sums over partial sums
-__kernel void sumColumns(__read_only image2d_t in, __global float* out) 
+__kernel void sumColumns(__global int16* in, int maxShearedW, __global int* out) 
 {
-	const int alphaIdx=get_global_id(0); // position for which calculation takes place
-	const int w=get_image_width(in); // width of img
-
-	float sum=0.0f;
-	for(int x=0; x<w; x++)
-	{
-		float4 px=read_imagef(in, sampler, (int2)(x,alphaIdx));
-		sum+=px.s0;
+	const int alphaIdx = get_global_id(0);
+	const int maxShearedW16 = maxShearedW / 16;
+	
+	int16 sum = (int16)(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	for(int x = 0; x < maxShearedW16; x++)
+	{	
+		sum += in[maxShearedW16 * alphaIdx + x];
 	}
 	
-	out[alphaIdx]=sum;
+	out[alphaIdx] = sum.s0 + sum.s1 + sum.s2 + sum.s3 + sum.s4 + sum.s5 + sum.s6 + sum.s7 + sum.s8 + sum.s9 + sum.sa + sum.sb + sum.sc + sum.sd + sum.se + sum.sf;
 }
 

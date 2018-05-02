@@ -2,7 +2,7 @@
 
 
 // uncomment next line to profile kernel1 and kernel2 and write result to variable timeKernel1/2
-//#define USE_GPU_PROFILING
+#define USE_GPU_PROFILING
 
 
 #include <string>
@@ -69,7 +69,7 @@ namespace htr
 		// max width of a sheared img
 		size_t maxShearedW = 0;
 		// result buffer
-		std::vector<float> resBuffer = std::vector<float>(numAlphaValues, 0.0f);
+		std::vector<cl_int> resBuffer = std::vector<cl_int>(numAlphaValues, 0);
 	};
 
 }

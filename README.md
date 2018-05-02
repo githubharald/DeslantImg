@@ -41,7 +41,7 @@ It returns the deslanted image computed on the **CPU**.
 const cv::Mat img = cv::imread("data/test1.png", cv::IMREAD_GRAYSCALE);
 
 // deslant it
-cv::Mat res = htr::deslantImg(img, 255);
+const cv::Mat res = htr::deslantImg(img, 255);
 
 // and save the result
 cv::imwrite("out1.png", res);
@@ -59,7 +59,7 @@ const cv::Mat img = cv::imread("data/test1.png", cv::IMREAD_GRAYSCALE);
 
 // deslant it
 htr::CLWrapper clWrapper;
-cv::Mat res = htr::deslantImg(img, 255, clWrapper);
+const cv::Mat res = htr::deslantImg(img, 255, clWrapper);
 
 // and save the result
 cv::imwrite("out1.png", res);

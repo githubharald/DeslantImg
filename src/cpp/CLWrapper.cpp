@@ -21,7 +21,8 @@ namespace htr
 
 	CLWrapper::CLWrapper()
 	{
-		maxShearedW = imgW - alphaVals[0] * imgH;
+		maxShearedW = static_cast<size_t>(imgW - alphaVals[0] * imgH);
+		assert(maxShearedW % 16 == 0); // must be multiple of 16 such that int16 can be used in kernel
 		setupDevice();
 		setupKernel(1);
 		setupKernel(2);
@@ -166,7 +167,7 @@ namespace htr
 	void CLWrapper::setData(const cv::Mat& img)
 	{
 		// resize to fixed size
-		assert(imgW==img.size().width && imgH==img.size().height);
+		assert(imgW == img.size().width && imgH == img.size().height);
 
 		// allocate buffers only once
 		int err = 0;
@@ -185,7 +186,8 @@ namespace htr
 			}
 
 			// out 1: we need enough columns to hold result for sheared img with max. shear value
-			dataOut1 = clCreateImage2D(context, CL_MEM_WRITE_ONLY, &imgFormat, maxShearedW, numAlphaValues, 0, NULL, &err);
+			//dataOut1 = clCreateImage2D(context, CL_MEM_WRITE_ONLY, &imgFormat, maxShearedW, numAlphaValues, 0, NULL, &err);
+			dataOut1 = clCreateBuffer(context, CL_MEM_WRITE_ONLY, sizeof(cl_int) * maxShearedW * numAlphaValues, NULL, &err);
 			if (err < 0)
 			{
 				throw std::runtime_error("Couldn't create a buffer object");
@@ -195,7 +197,7 @@ namespace htr
 			dataIn2 = dataOut1;
 
 			// out 2
-			dataOut2 = clCreateBuffer(context, CL_MEM_WRITE_ONLY, sizeof(float)*numAlphaValues, NULL, &err);
+			dataOut2 = clCreateBuffer(context, CL_MEM_WRITE_ONLY, sizeof(cl_int)*numAlphaValues, NULL, &err);
 			if (err < 0)
 			{
 				throw std::runtime_error("Couldn't create a buffer object");
@@ -210,7 +212,15 @@ namespace htr
 			}
 
 			// arg1
-			err = clSetKernelArg(kernel1, 1, sizeof(cl_mem), &dataOut1);
+			const cl_int maxShearedWAsInt = static_cast<cl_int>(maxShearedW);
+			err = clSetKernelArg(kernel1, 1, sizeof(cl_int), &maxShearedWAsInt);
+			if (err < 0)
+			{
+				throw std::runtime_error("Couldn't set the kernel argument");
+			}
+
+			// arg2
+			err = clSetKernelArg(kernel1, 2, sizeof(cl_mem), &dataOut1);
 			if (err < 0)
 			{
 				throw std::runtime_error("Couldn't set the kernel argument");
@@ -225,7 +235,14 @@ namespace htr
 			}
 
 			// arg1
-			err = clSetKernelArg(kernel2, 1, sizeof(cl_mem), &dataOut2);
+			err = clSetKernelArg(kernel2, 1, sizeof(cl_int), &maxShearedWAsInt);
+			if (err < 0)
+			{
+				throw std::runtime_error("Couldn't set the kernel argument");
+			}
+
+			// arg2
+			err = clSetKernelArg(kernel2, 2, sizeof(cl_mem), &dataOut2);
 			if (err < 0)
 			{
 				throw std::runtime_error("Couldn't set the kernel argument");
@@ -257,7 +274,7 @@ namespace htr
 
 		// execute kernel2
 		cl_event eventKernel2;
-		const size_t workItems2[1] = { maxShearedW };
+		const size_t workItems2[1] = { numAlphaValues };
 		err = clEnqueueNDRangeKernel(queue, kernel2, 1, NULL, workItems2, NULL, 0, NULL, &eventKernel2);
 		if (err < 0)
 		{
@@ -265,7 +282,7 @@ namespace htr
 		}
 
 		// read result
-		err = clEnqueueReadBuffer(queue, dataOut2, CL_TRUE, 0, sizeof(float)*numAlphaValues, resBuffer.data(), 0, NULL, NULL);
+		err = clEnqueueReadBuffer(queue, dataOut2, CL_TRUE, 0, sizeof(cl_int)*numAlphaValues, resBuffer.data(), 0, NULL, NULL);
 		if (err < 0)
 		{
 			throw std::runtime_error("Couldn't enqueue the read buffer command");
@@ -283,7 +300,7 @@ namespace htr
 #endif
 
 		size_t maxAlphaIdx = 0;
-		float maxAlphaVal = 0.0f;
+		cl_int maxAlphaVal = 0;
 		for (size_t i = 0; i < numAlphaValues; ++i)
 		{
 			if (resBuffer[i] > maxAlphaVal)
