@@ -29,12 +29,16 @@ namespace htr
 		float compute();
 
 		// some constants regarding data
-		const size_t imgW = 1024, imgH = 128; // use fixed input size to avoid buffer reallocation
+		const size_t maxShearedW = 1024;
+		const size_t imgH = 128;
+		const size_t imgW = maxShearedW - imgH;
 		const size_t numAlphaValues = 9;
+		const size_t numWorkgroups = 4; 
+		const size_t sizeWorkgroup = maxShearedW / numWorkgroups;
 
 #ifdef USE_GPU_PROFILING
 		// profiling info
-		cl_ulong timeKernel1=0, timeKernel2=0;
+		cl_ulong timeKernel1 = 0, timeKernel2 = 0;
 #endif
 
 	private:
@@ -47,16 +51,16 @@ namespace htr
 		void releaseData();
 
 		// plattform, device, context and queue
-		cl_platform_id platform;
-		cl_device_id device;
-		cl_context context;
-		cl_command_queue queue;
+		cl_platform_id platform = nullptr;
+		cl_device_id device = nullptr;
+		cl_context context = nullptr;
+		cl_command_queue queue = nullptr;
 		// kernel for pass 1
-		cl_program program1;
-		cl_kernel kernel1;
+		cl_program program1 = nullptr;
+		cl_kernel kernel1 = nullptr;
 		// kernel for pass 2
-		cl_program program2;
-		cl_kernel kernel2;
+		cl_program program2 = nullptr;
+		cl_kernel kernel2 = nullptr;
 		
 		// data for pass 1
 		cl_mem dataIn1 = nullptr;
@@ -66,10 +70,6 @@ namespace htr
 		cl_mem dataOut2 = nullptr;
 		// remember if buffers already allocated
 		bool dataAlloc = false;
-		// max width of a sheared img
-		size_t maxShearedW = 0;
-		// result buffer
-		std::vector<cl_int> resBuffer = std::vector<cl_int>(numAlphaValues, 0);
 	};
 
 }

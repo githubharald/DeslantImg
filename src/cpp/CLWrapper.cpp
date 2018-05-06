@@ -12,17 +12,11 @@
 #include <opencv2/highgui.hpp>
 
 
-const size_t NUM_ALPHA_VALS = 9;
-float alphaVals[NUM_ALPHA_VALS] = { -1.0f, -0.75f, -0.5f, -0.25f, 0.0f, 0.25f, 0.5f, 0.75f, 1.0f };
-
-
 namespace htr
 {
 
 	CLWrapper::CLWrapper()
 	{
-		maxShearedW = static_cast<size_t>(imgW - alphaVals[0] * imgH);
-		assert(maxShearedW % 16 == 0); // must be multiple of 16 such that int16 can be used in kernel
 		setupDevice();
 		setupKernel(1);
 		setupKernel(2);
@@ -99,6 +93,8 @@ namespace htr
 
 	void CLWrapper::setupKernel(int programID)
 	{
+		assert(programID == 1 || programID == 2);
+
 		// read kernel
 		std::ifstream f(programID == 1 ? "src/cl/ProcessColumns.cl" : "src/cl/SumColumns.cl");
 		const std::string strKernel((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
@@ -175,9 +171,9 @@ namespace htr
 		{
 			dataAlloc = true;
 
-			// in 1
+			// in 1: image with fixed size
 			cl_image_format imgFormat;
-			imgFormat.image_channel_data_type = CL_FLOAT;
+			imgFormat.image_channel_data_type = CL_UNORM_INT8;
 			imgFormat.image_channel_order = CL_LUMINANCE;
 			dataIn1 = clCreateImage2D(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, &imgFormat, imgW, imgH, 0, img.data, &err);
 			if (err < 0)
@@ -185,19 +181,18 @@ namespace htr
 				throw std::runtime_error("Couldn't create a buffer object");
 			}
 
-			// out 1: we need enough columns to hold result for sheared img with max. shear value
-			//dataOut1 = clCreateImage2D(context, CL_MEM_WRITE_ONLY, &imgFormat, maxShearedW, numAlphaValues, 0, NULL, &err);
-			dataOut1 = clCreateBuffer(context, CL_MEM_WRITE_ONLY, sizeof(cl_int) * maxShearedW * numAlphaValues, NULL, &err);
+			// out 1: sum for each workgroup and shear angle
+			dataOut1 = clCreateBuffer(context, CL_MEM_WRITE_ONLY, sizeof(cl_int) * numWorkgroups * numAlphaValues, NULL, &err);
 			if (err < 0)
 			{
 				throw std::runtime_error("Couldn't create a buffer object");
 			}
 
-			// in 2
+			// in 2: output of first kernel
 			dataIn2 = dataOut1;
 
-			// out 2
-			dataOut2 = clCreateBuffer(context, CL_MEM_WRITE_ONLY, sizeof(cl_int)*numAlphaValues, NULL, &err);
+			// out 2: the shear angle which minimizes the slant of the text
+			dataOut2 = clCreateBuffer(context, CL_MEM_WRITE_ONLY, sizeof(cl_float), NULL, &err);
 			if (err < 0)
 			{
 				throw std::runtime_error("Couldn't create a buffer object");
@@ -212,15 +207,7 @@ namespace htr
 			}
 
 			// arg1
-			const cl_int maxShearedWAsInt = static_cast<cl_int>(maxShearedW);
-			err = clSetKernelArg(kernel1, 1, sizeof(cl_int), &maxShearedWAsInt);
-			if (err < 0)
-			{
-				throw std::runtime_error("Couldn't set the kernel argument");
-			}
-
-			// arg2
-			err = clSetKernelArg(kernel1, 2, sizeof(cl_mem), &dataOut1);
+			err = clSetKernelArg(kernel1, 1, sizeof(cl_mem), &dataOut1);
 			if (err < 0)
 			{
 				throw std::runtime_error("Couldn't set the kernel argument");
@@ -235,14 +222,7 @@ namespace htr
 			}
 
 			// arg1
-			err = clSetKernelArg(kernel2, 1, sizeof(cl_int), &maxShearedWAsInt);
-			if (err < 0)
-			{
-				throw std::runtime_error("Couldn't set the kernel argument");
-			}
-
-			// arg2
-			err = clSetKernelArg(kernel2, 2, sizeof(cl_mem), &dataOut2);
+			err = clSetKernelArg(kernel2, 1, sizeof(cl_mem), &dataOut2);
 			if (err < 0)
 			{
 				throw std::runtime_error("Couldn't set the kernel argument");
@@ -265,8 +245,9 @@ namespace htr
 	{
 		// execute kernel1
 		cl_event eventKernel1;
-		const size_t workItems1[2] = { maxShearedW, numAlphaValues };
-		int err = clEnqueueNDRangeKernel(queue, kernel1, 2, NULL, workItems1, NULL, 0, NULL, &eventKernel1);
+		const size_t globalSize1[2] = { maxShearedW, numAlphaValues };
+		const size_t localSize1[2] = { sizeWorkgroup, 1 };
+		int err = clEnqueueNDRangeKernel(queue, kernel1, 2, NULL, globalSize1, localSize1, 0, NULL, &eventKernel1);
 		if (err < 0)
 		{
 			throw std::runtime_error("Couldn't enqueue the kernel execution command");
@@ -274,15 +255,17 @@ namespace htr
 
 		// execute kernel2
 		cl_event eventKernel2;
-		const size_t workItems2[1] = { numAlphaValues };
-		err = clEnqueueNDRangeKernel(queue, kernel2, 1, NULL, workItems2, NULL, 0, NULL, &eventKernel2);
+		const size_t globalSize2[1] = { numAlphaValues };
+		const size_t localSize2[1] = { numAlphaValues };
+		err = clEnqueueNDRangeKernel(queue, kernel2, 1, NULL, globalSize2, localSize2, 0, NULL, &eventKernel2);
 		if (err < 0)
 		{
 			throw std::runtime_error("Couldn't enqueue the kernel execution command");
 		}
 
 		// read result
-		err = clEnqueueReadBuffer(queue, dataOut2, CL_TRUE, 0, sizeof(cl_int)*numAlphaValues, resBuffer.data(), 0, NULL, NULL);
+		cl_float bestAlphaVal=0.0f;
+		err = clEnqueueReadBuffer(queue, dataOut2, CL_TRUE, 0, sizeof(cl_float), &bestAlphaVal, 0, NULL, NULL);
 		if (err < 0)
 		{
 			throw std::runtime_error("Couldn't enqueue the read buffer command");
@@ -299,19 +282,7 @@ namespace htr
 		timeKernel2 = te - ts;
 #endif
 
-		size_t maxAlphaIdx = 0;
-		cl_int maxAlphaVal = 0;
-		for (size_t i = 0; i < numAlphaValues; ++i)
-		{
-			if (resBuffer[i] > maxAlphaVal)
-			{
-				maxAlphaVal = resBuffer[i];
-				maxAlphaIdx = i;
-			}
-		}
-
-		// put into cv::Mat
-		return -alphaVals[maxAlphaIdx];
+		return bestAlphaVal;
 	}
 
 }

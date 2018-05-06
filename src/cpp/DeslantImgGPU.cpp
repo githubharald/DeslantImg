@@ -1,5 +1,6 @@
 #include "DeslantImgGPU.hpp"
 #include <opencv2/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
 
 
 namespace htr
@@ -44,7 +45,6 @@ namespace htr
 		// copy into target image and convert to float image (32 bit, 1 channel)
 		cv::Mat targetImg=cv::Mat::zeros(cv::Size(static_cast<int>(clWrapper.imgW), static_cast<int>(clWrapper.imgH)), CV_8UC1);
 		imgBW.copyTo(targetImg(cv::Rect(0, 0, imgBW.size().width, imgBW.size().height)));
-		targetImg.convertTo(targetImg, CV_32FC1, 1.0 / 255.0);
 
 		// upload image data to GPU
 		clWrapper.setData(targetImg);
