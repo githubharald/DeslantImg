@@ -1,9 +1,15 @@
-// list of shearing angles
+// number of shear angles
 #define NUM_ALPHA_VALS 9
-__constant float alphaVals[NUM_ALPHA_VALS] = { -1.0f, -0.75f, -0.5f, -0.25f, 0.0f, 0.25f, 0.5f, 0.75f, 1.0f };
 
 // sampler for image
 __constant sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP | CLK_FILTER_NEAREST;
+
+
+// return alpha value corresponding to alpha index (must be between 0 and NUM_ALPHA_VALS-1)
+float alphaVal(int alphaIdx)
+{
+	return alphaIdx / 4.0f - 1.0f;
+}
 
 
 // kernel calculates partial sums for sheared images
@@ -11,7 +17,7 @@ __kernel void processColumns(__read_only image2d_t in, __global int* out)
 {
 	const int h = get_image_height(in); // height of img
 	const int alphaIdx = get_global_id(1); // shear index
-	const float alpha = alphaVals[alphaIdx]; // shear angle
+	const float alpha = alphaVal(alphaIdx); //alphaVals[alphaIdx]; // shear angle
 	const int xOffset = get_global_id(0) + alpha * (1-h); // offset into image
 	
 	// calculate length of the single continuous line of fg pixels, if it exists
@@ -49,4 +55,38 @@ __kernel void processColumns(__read_only image2d_t in, __global int* out)
 		out[get_num_groups(0) * alphaIdx + get_group_id(0)] = localSum;
 	}
 }
+
+
+// kernel sums over partial sums
+__kernel void sumColumns(__global int4* in, __global float* out)
+{
+	// calculate result for work item
+	const int id = get_global_id(0);
+	const int4 tmp4 = in[id];
+	const int2 tmp2 = tmp4.s01 + tmp4.s23;
+	const int res = tmp2.s0 + tmp2.s1;
+
+	// write result to local memory
+	__local int alphaRes[NUM_ALPHA_VALS];
+	alphaRes[id] = res;
+
+	// return best result
+	barrier(CLK_LOCAL_MEM_FENCE);
+	if (id == 0)
+	{
+		int bestIdx = 0;
+		int bestVal = 0;
+		for (int i = 0; i < NUM_ALPHA_VALS; ++i)
+		{
+			const int currVal = alphaRes[i];
+			if (currVal > bestVal)
+			{
+				bestVal = currVal;
+				bestIdx = i;
+			}
+		}
+		*out = -alphaVal(bestIdx); // return negative value because operation performed is inverse to shear transform
+	}
+}
+
 

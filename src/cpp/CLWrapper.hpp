@@ -46,8 +46,8 @@ namespace htr
 		CLWrapper& operator=(CLWrapper&) = delete;
 
 		void setupDevice();
-		void setupKernel(int programID);
-		std::string buildErrorString(int programID);
+		void setupKernel();
+		std::string buildErrorString();
 		void releaseData();
 
 		// plattform, device, context and queue
@@ -55,11 +55,9 @@ namespace htr
 		cl_device_id device = nullptr;
 		cl_context context = nullptr;
 		cl_command_queue queue = nullptr;
-		// kernel for pass 1
-		cl_program program1 = nullptr;
+		// program and kernel
+		cl_program program = nullptr;
 		cl_kernel kernel1 = nullptr;
-		// kernel for pass 2
-		cl_program program2 = nullptr;
 		cl_kernel kernel2 = nullptr;
 		
 		// data for pass 1

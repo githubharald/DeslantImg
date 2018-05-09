@@ -18,8 +18,7 @@ namespace htr
 	CLWrapper::CLWrapper()
 	{
 		setupDevice();
-		setupKernel(1);
-		setupKernel(2);
+		setupKernel();
 	}
 
 
@@ -33,12 +32,12 @@ namespace htr
 		clReleaseKernel(kernel2);
 
 		// program
-		clReleaseProgram(program1);
-		clReleaseProgram(program2);
+		clReleaseProgram(program);
 
-		// queue, context
+		// queue, context, device
 		clReleaseCommandQueue(queue);
 		clReleaseContext(context);
+
 	}
 
 
@@ -78,84 +77,66 @@ namespace htr
 	}
 
 
-	std::string CLWrapper::buildErrorString(int programID)
+	std::string CLWrapper::buildErrorString()
 	{
 		// create char buf
 		size_t logSize = 0;
-		clGetProgramBuildInfo(programID == 1 ? program1 : program2, device, CL_PROGRAM_BUILD_LOG, 0, NULL, &logSize);
+		clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, 0, NULL, &logSize);
 		std::vector<char> charBuf(logSize, 0);
 
 		// read into char buf and return as string
-		clGetProgramBuildInfo(programID == 1 ? program1 : program2, device, CL_PROGRAM_BUILD_LOG, logSize, charBuf.data(), NULL);
+		clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, logSize, charBuf.data(), NULL);
 		return std::string(charBuf.begin(), charBuf.end());
 	}
 
 
-	void CLWrapper::setupKernel(int programID)
+	void CLWrapper::setupKernel()
 	{
-		assert(programID == 1 || programID == 2);
-
 		// read kernel
-		std::ifstream f(programID == 1 ? "src/cl/ProcessColumns.cl" : "src/cl/SumColumns.cl");
+		std::ifstream f("src/cl/Kernel.cl");
 		const std::string strKernel((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
 		const size_t kernelSize = strKernel.size();
 		const char* ptrToStrKernel = strKernel.data();
 
 		// create program
 		int err = 0;
-		cl_program program = clCreateProgramWithSource(context, 1, &ptrToStrKernel, &kernelSize, &err);
+		program = clCreateProgramWithSource(context, 1, &ptrToStrKernel, &kernelSize, &err);
 		if (err < 0)
 		{
 			throw std::runtime_error("Couldn't create the program");
-		}
-		if (programID == 1)
-		{
-			program1 = program;
-		}
-		else
-		{
-			program2 = program;
-		}
+		}		
 
 		// build program
-		err = clBuildProgram(programID == 1 ? program1 : program2, 0, NULL, NULL, NULL, NULL);
+		err = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
 		if (err < 0)
 		{
-			throw std::runtime_error(buildErrorString(programID).c_str());
+			throw std::runtime_error(buildErrorString().c_str());
 		}
 
 		// kernel
-		cl_kernel kernel = clCreateKernel(programID == 1 ? program1 : program2, programID == 1 ? "processColumns" : "sumColumns", &err);
+		kernel1 = clCreateKernel(program,"processColumns", &err);
 		if (err < 0)
 		{
 			throw std::runtime_error("Couldn't create the kernel");
 		}
-		if (programID == 1)
+
+		// kernel2
+		kernel2 = clCreateKernel(program, "sumColumns", &err);
+		if (err < 0)
 		{
-			kernel1 = kernel;
+			throw std::runtime_error("Couldn't create the kernel");
 		}
-		else
-		{
-			kernel2 = kernel;
-		}
+		
 	}
 
 
 	void CLWrapper::releaseData()
 	{
-		if (!dataIn1)
+		if (dataAlloc)
 		{
 			clReleaseMemObject(dataIn1);
-		}
-
-		if (!dataOut1) // dataOut1 == dataIn2
-		{
 			clReleaseMemObject(dataOut1);
-		}
-
-		if (!dataOut2)
-		{
-			clReleaseMemObject(dataOut1);
+			clReleaseMemObject(dataOut2);
 		}
 	}
 
@@ -281,6 +262,9 @@ namespace htr
 		clGetEventProfilingInfo(eventKernel2, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &te, NULL);
 		timeKernel2 = te - ts;
 #endif
+
+		clReleaseEvent(eventKernel1);
+		clReleaseEvent(eventKernel2);
 
 		return bestAlphaVal;
 	}
