@@ -20,7 +20,7 @@ Build **CPU** implementation on Linux (OpenCV must be installed):
 
 
 If the macro **USE_GPU** is defined in ```main.cpp```, the computation takes place on the GPU.
-Build **CPU and GPU** implementation on Linux (OpenCV and OpenGL must be installed):
+Build **CPU and GPU** implementation on Linux (OpenCV and OpenCL must be installed):
 ```g++ --std=c++11 src/cpp/main.cpp src/cpp/DeslantImgCPU.cpp src/cpp/DeslantImgGPU.cpp src/cpp/CLWrapper.cpp `pkg-config --cflags --libs opencv` -lOpenCL -o DeslantImg```
 
 
