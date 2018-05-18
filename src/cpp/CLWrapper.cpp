@@ -156,7 +156,7 @@ namespace htr
 			cl_image_format imgFormat;
 			imgFormat.image_channel_data_type = CL_UNORM_INT8;
 			imgFormat.image_channel_order = CL_LUMINANCE;
-			dataIn1 = clCreateImage2D(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, &imgFormat, imgW, imgH, 0, img.data, &err);
+			dataIn1 = clCreateImage2D(context, CL_MEM_READ_ONLY, &imgFormat, imgW, imgH, 0, NULL, &err);
 			if (err < 0)
 			{
 				throw std::runtime_error("Couldn't create a buffer object");
