@@ -14,7 +14,7 @@ namespace htr
 		float sum_alpha = 0.0f;
 		cv::Mat transform;
 		cv::Size size;
-		bool operator < (const Result& rhs) { return sum_alpha < rhs.sum_alpha; }
+		bool operator < (const Result& rhs) const { return sum_alpha < rhs.sum_alpha; }
 	};
 
 
