@@ -10,22 +10,22 @@ The following illustration shows input and output of the algorithm for a given i
 
 Two implementations are provided:
 * CPU: all computations are done on the CPU using OpenCV.
-* GPU: each column and shear angle is processed in parallel using OpenCL to calculate the optimal shear angle, the remaining work is done on the CPU using OpenCV.
+* GPU: each column and shear angle is processed in parallel using OpenCL to compute the optimal shear angle, the remaining work is done on the CPU using OpenCV.
 
 
-## Getting started
+## Run demo
 
-Build **CPU** implementation on Linux (OpenCV must be installed):
+Use `./build.sh` to build the CPU version or `./build.sh gpu` to build the GPU version on Linux using g++.
+Then, run `./DeslantImg` to process the two images provided in the `data/` directory (taken from IAM dataset \[2\]).
+Two output files should occur in the repositories root directory.
+
+Some notes on how to compile the demo manually and how to compile for Windows or other operating systems:
+
+* Build **CPU** implementation on Linux (OpenCV must be installed):
 ```g++ --std=c++11 src/cpp/main.cpp src/cpp/DeslantImgCPU.cpp `pkg-config --cflags --libs opencv` -o DeslantImg ```
-
-
-If the macro **USE_GPU** is defined in ```main.cpp```, the computation takes place on the GPU.
-Build **CPU and GPU** implementation on Linux (OpenCV and OpenCL must be installed):
-```g++ --std=c++11 src/cpp/main.cpp src/cpp/DeslantImgCPU.cpp src/cpp/DeslantImgGPU.cpp src/cpp/CLWrapper.cpp `pkg-config --cflags --libs opencv` -lOpenCL -o DeslantImg```
-
-
-Deslant the two images provided in the ```data/``` directory (taken from IAM dataset \[2\]) and write output to the root directory of the repository:
-```./DeslantImg```
+* If the macro **USE_GPU** is defined, the computation takes place on the GPU. Build **CPU and GPU** implementation on Linux (OpenCV and OpenCL must be installed):
+```g++ --std=c++11 -D USE_GPU src/cpp/main.cpp src/cpp/DeslantImgCPU.cpp src/cpp/DeslantImgGPU.cpp src/cpp/CLWrapper.cpp `pkg-config --cflags --libs opencv` -lOpenCL -o DeslantImg```
+* On Windows, the easiest way is to use Microsoft Visual Studio, put all files into a C++ project, set include and library paths for OpenCV and optionally OpenCL, and finally compile and run the program
 
 
 ## Documentation
@@ -79,3 +79,4 @@ Here is a short outline of the algorithm:
 \[1\] Vinciarelli and Luettin - A new normalization technique for cursive handwritten words
 
 \[2\] IAM dataset: http://www.fki.inf.unibe.ch/databases/iam-handwriting-database
+

@@ -1,7 +1,3 @@
-// uncomment next line to use GPU via OpenCL
-//#define USE_GPU
-
-
 #ifdef USE_GPU
 #include "DeslantImgGPU.hpp"
 #else
