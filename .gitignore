@@ -1,3 +1,4 @@
-proj/
-/*.png
+.idea
+proj
 *.dll
+__pycache__

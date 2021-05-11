@@ -1,23 +1,36 @@
 # Deslanting Algorithm
 
-**Algorithm removes cursive writing style | Handwritten Text Recognition | C++ | OpenCV | OpenCL**
+**Update 2021: added Python implementation**
 
-This algorithm sets (handwritten) text in images upright, i.e. it removes the cursive writing style.
-It is used as a preprocessing step for handwritten text recognition.
-The following illustration shows input and output of the algorithm for a given image (```data/test1.png```).
+This algorithm sets handwritten text in images upright, i.e. it removes the cursive writing style.
+One can use it as a preprocessing step for handwritten text recognition.
+The following illustration shows input and output of the algorithm for a given image (`data/test1.png`).
 
-![deslanting](./doc/deslanting.png)
+![deslanting](doc/deslanting.png)
 
-Two implementations are provided:
-* CPU: all computations are done on the CPU using OpenCV.
-* GPU: each column and shear angle is processed in parallel using OpenCL to compute the optimal shear angle, the remaining work is done on the CPU using OpenCV.
+Three implementations are provided:
+* Python
+* C++: all computations are done on the CPU using OpenCV
+* OpenCL: each column and shear angle is processed in parallel using OpenCL to compute the optimal shear angle, the remaining work is done on the CPU using OpenCV
 
 
 ## Run demo
 
-Use `./build.sh` to build the CPU version or `./build.sh gpu` to build the GPU version on Linux using g++.
-Then, run `./DeslantImg` to process the two images provided in the `data/` directory (taken from IAM dataset \[2\]).
-Two output files should occur in the repositories root directory.
+### Python
+
+* Install required packages by running `pip install -r requirements.txt`
+* Go to the directory `src/py`
+* Run `python main.py` to process the images in the `data` directory (images taken from IAM and Bentham dataset)
+* This opens a window showing the input image, deslanted image and score values
+* The script can be configured via command line, see available options by running `python main.py -h`
+
+![plot](doc/plot.png)
+
+### C++ and OpenCL
+
+* Use `./build.sh` to build the CPU version or `./build.sh gpu` to build the GPU version on Linux using g++
+* Run `./DeslantImg` to process the images in the `data/` directory
+* Two processed images are saved in the repositories root directory
 
 Some notes on how to compile the demo manually and how to compile for Windows or other operating systems:
 
@@ -30,7 +43,11 @@ Some notes on how to compile the demo manually and how to compile for Windows or
 
 ## Documentation
 
-Call function ```deslantImg(img, bgcolor)``` with the input image (grayscale) and the background color (to fill empty image space).
+### Python
+See docstrings for the documentation of the Python implementation.
+
+### C++
+Call function ```deslantImg(img, bgcolor)``` with the input image (grayscale), and the background color (to fill empty image space).
 It returns the deslanted image computed on the **CPU**.
 
 ```
@@ -47,7 +64,8 @@ const cv::Mat res = htr::deslantImg(img, 255);
 cv::imwrite("out1.png", res);
 ```
 
-The **GPU** version additionally takes an instance of ```CLWrapper``` which holds all relevant information needed for OpenCL: ```deslantImg(img, bgcolor, clWrapper)```.
+###OpenCL
+The GPU version additionally takes an instance of ```CLWrapper``` which holds all relevant information needed for OpenCL: ```deslantImg(img, bgcolor, clWrapper)```.
 As the construction of a ```CLWrapper``` instance takes time, it makes sense to only create one instance and use it for all future calls to ```deslantImg(img, bgcolor, clWrapper)```. 
 
 ```
@@ -68,15 +86,7 @@ cv::imwrite("out1.png", res);
 
 ## Algorithm 
 
-Vinciarelli and Luettin describe the algorithm in their paper \[1].
+Vinciarelli and Luettin describe the algorithm in their paper.
 Here is a short outline of the algorithm:
 
-![algo](./doc/algo.png)
-
-
-## References
-
-\[1\] Vinciarelli and Luettin - A new normalization technique for cursive handwritten words
-
-\[2\] IAM dataset: http://www.fki.inf.unibe.ch/databases/iam-handwriting-database
-
+![algo](doc/algo.png)
