@@ -64,7 +64,7 @@ const cv::Mat res = htr::deslantImg(img, 255);
 cv::imwrite("out1.png", res);
 ```
 
-###OpenCL
+### OpenCL
 The GPU version additionally takes an instance of ```CLWrapper``` which holds all relevant information needed for OpenCL: ```deslantImg(img, bgcolor, clWrapper)```.
 As the construction of a ```CLWrapper``` instance takes time, it makes sense to only create one instance and use it for all future calls to ```deslantImg(img, bgcolor, clWrapper)```. 
 
