@@ -44,7 +44,15 @@ Some notes on how to compile the demo manually and how to compile for Windows or
 ## Documentation
 
 ### Python
-See docstrings for the documentation of the Python implementation.
+
+Command line options of `main.py`:
+* `--data`: directory containing the input images
+* `--optim_algo`: either do grid search ('grid'), or apply Powell's derivative-free optimizer ('powell')
+* `--lower_bound`: lower bound of shear values
+* `--upper_bound`: upper bound of shear values
+* `--num_steps`: if grid search is used, this argument defines the number if grid points
+* `--bg_color`: color to fill the gaps of the sheared image that is returned
+
 
 ### C++
 Call function ```deslantImg(img, bgcolor)``` with the input image (grayscale), and the background color (to fill empty image space).
