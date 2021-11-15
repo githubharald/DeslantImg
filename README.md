@@ -50,13 +50,44 @@ Some notes on how to compile the demo manually and how to compile for Windows or
 ### Python GUI
 
 Command line options of `DeslantImgPlot`:
-* `--data`: directory containing the (.png|.jpg|.bmp) input images
-* `--optim_algo`: either do grid search (`grid`), or apply Powell's derivative-free optimizer (`powell`)
-* `--lower_bound`: lower bound of shear values
-* `--upper_bound`: upper bound of shear values
-* `--num_steps`: if grid search is used, this argument defines the number if grid points
-* `--bg_color`: color to fill the gaps of the sheared image that is returned
+```
+usage: DeslantImgPlot [-h] [--data DATA] [--optim_algo {grid,powell}]
+                      [--lower_bound LO] [--upper_bound HI]
+                      [--num_steps STEPS] [--bg_color BG]
 
+optional arguments:
+  -h, --help            show this help message and exit
+  --data DATA           directory containing the (.png|.jpg|.bmp) input images
+  --optim_algo {grid,powell}
+                        either do grid search, or apply Powell's derivative-
+                        free optimizer
+  --lower_bound LO      lower bound of shear values
+  --upper_bound HI      upper bound of shear values
+  --num_steps STEPS     if grid search is used, this argument defines the
+                        number if grid points
+  --bg_color BG         color to fill the gaps of the sheared image that is
+                        returned
+```
+
+### C++ CLI
+
+Command line options of `DeslantImg`:
+```
+Usage: DeslantImg [params] 
+
+	-?, -h, --help, --usage (value:true)
+		print this message
+	--data (value:data)
+		directory to read the input images from
+	--dataout (value:.)
+		directory to write the output images to
+	--bg_color (value:255)
+		color to fill the gaps of the sheared image that is returned
+	--lower_bound (value:-1.0)
+		lower bound of shear values
+	--upper_bound (value:1.0)
+		upper bound of shear values
+```
 
 ### C++ API
 Call function `deslantImg(img, bgcolor)` with the input image (grayscale), and the background color (to fill empty image space).
@@ -76,7 +107,7 @@ const cv::Mat res = htr::deslantImg(img, 255);
 cv::imwrite("out1.png", res);
 ```
 
-### OpenCL API
+### C++ OpenCL API
 The GPU version additionally takes an instance of `CLWrapper` which holds all relevant information needed for OpenCL: `deslantImg(img, bgcolor, clWrapper)`.
 As the construction of a `CLWrapper` instance takes time, it makes sense to only create one instance and use it for all future calls to `deslantImg(img, bgcolor, clWrapper)`. 
 
