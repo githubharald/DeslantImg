@@ -29,7 +29,7 @@ Three implementations are provided:
 
 * Use `./build.sh` to build the CPU version, or `./build.sh gpu` to build the GPU version on Linux using g++  
   Alternatively, use `make` to build the CPU version, or `make GPU=1` to build to GPU version.
-* Run `./DeslantImg` (without arguments) to process the images in the `data/` directory
+* Run `./DeslantImg` to process the images in the `data/` directory
 * Two processed images are saved in the repositories root directory
 
 Some notes on how to compile the demo manually and how to compile for Windows or other operating systems:
@@ -73,20 +73,21 @@ optional arguments:
 
 Command line options of `DeslantImg`:
 ```
-Usage: DeslantImg [params] 
+Usage: DeslantImg [params] imagein imageout 
 
 	-?, -h, --help, --usage (value:true)
 		print this message
-	--data (value:data)
-		directory to read the input images from
-	--dataout (value:.)
-		directory to write the output images to
 	--bg_color (value:255)
 		color to fill the gaps of the sheared image that is returned
 	--lower_bound (value:-1.0)
 		lower bound of shear values
 	--upper_bound (value:1.0)
 		upper bound of shear values
+
+	imagein (value:-)
+		path name to read the input image from (or stdin)
+	imageout (value:-)
+		path name to write the output image to (or stdout)
 ```
 
 ### C++ API
