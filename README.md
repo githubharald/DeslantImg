@@ -19,9 +19,9 @@ Three implementations are provided:
 ### Python
 
 * Install by running `pip install .`
-* Run `DeslantImgPlot` (without arguments) to process the images in the `data` directory (images taken from IAM and Bentham dataset)
+* Run `deslant` (without arguments) from the command line to process the images in the `data` directory (images taken from IAM and Bentham dataset)
 * This opens a window showing the input image, deslanted image and score values
-* The script can be configured via command line, see available options [below](#python-gui), or by running `DeslantImgPlot -h`
+* The script can be configured via command line, see available options [below](#python-gui), or by running `deslant -h`
 
 ![plot](doc/plot.png)
 
@@ -49,11 +49,11 @@ Some notes on how to compile the demo manually and how to compile for Windows or
 
 ### Python GUI
 
-Command line options of `DeslantImgPlot`:
+Command line options of `deslant`:
 ```
-usage: DeslantImgPlot [-h] [--data DATA] [--optim_algo {grid,powell}]
-                      [--lower_bound LO] [--upper_bound HI]
-                      [--num_steps STEPS] [--bg_color BG]
+usage: deslant [-h] [--data DATA] [--optim_algo {grid,powell}]
+               [--lower_bound LO] [--upper_bound HI]
+               [--num_steps STEPS] [--bg_color BG]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -68,6 +68,9 @@ optional arguments:
   --bg_color BG         color to fill the gaps of the sheared image that is
                         returned
 ```
+
+### Python API
+TODO
 
 ### C++ CLI
 

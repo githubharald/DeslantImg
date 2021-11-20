@@ -20,7 +20,7 @@ def get_img_files(data_dir: Path) -> List[Path]:
 def parse_args():
     """Parses command line args."""
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data', type=Path, default=Path('../../data/'),
+    parser.add_argument('--data', type=Path, default=Path('data'),
                         help='directory containing the (.png|.jpg|.bmp) input images')
     parser.add_argument('--optim_algo', choices=['grid', 'powell'], default='grid',
                         help='either do grid search, or apply Powell\'s derivative-free optimizer')
