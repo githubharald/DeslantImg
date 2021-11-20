@@ -18,12 +18,12 @@ setup(
     author='Harald Scheidl',
     url='https://github.com/githubharald/DeslantImg',
     license='MIT',
-    py_modules=['main', 'deslant'],
+    py_modules=['deslant_img_cli_script', 'deslant_img'],
     package_dir={'': 'src/py'},
     install_requires=open('requirements.txt').read().split('\n'),
     entry_points={
         'console_scripts': [
-            'deslant=deslant_cli_script:main'
+            'deslant_img=deslant_img_cli_script:main'
         ]
     }
 )
