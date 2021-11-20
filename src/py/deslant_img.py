@@ -49,12 +49,12 @@ def _compute_score(img_binary: np.ndarray, s: float) -> float:
     return score
 
 
-def deslant(img: np.ndarray,
-            optim_algo: 'str' = 'grid',
-            lower_bound: float = -2,
-            upper_bound: float = 2,
-            num_steps: int = 20,
-            bg_color=255) -> DeslantRes:
+def deslant_img(img: np.ndarray,
+                optim_algo: 'str' = 'grid',
+                lower_bound: float = -2,
+                upper_bound: float = 2,
+                num_steps: int = 20,
+                bg_color=255) -> DeslantRes:
     """
     Deslants the image by applying a shear transform.
 

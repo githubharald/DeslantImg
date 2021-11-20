@@ -6,7 +6,7 @@ import cv2
 import matplotlib.pyplot as plt
 from path import Path
 
-from deslant import deslant
+from deslant_img import deslant_img
 
 
 def get_img_files(data_dir: Path) -> List[Path]:
@@ -47,12 +47,12 @@ def main():
 
         # process image
         t0 = perf_counter()
-        res = deslant(img,
-                      optim_algo=parsed.optim_algo,
-                      lower_bound=parsed.lower_bound,
-                      upper_bound=parsed.upper_bound,
-                      num_steps=parsed.num_steps,
-                      bg_color=parsed.bg_color)
+        res = deslant_img(img,
+                          optim_algo=parsed.optim_algo,
+                          lower_bound=parsed.lower_bound,
+                          upper_bound=parsed.upper_bound,
+                          num_steps=parsed.num_steps,
+                          bg_color=parsed.bg_color)
         t1 = perf_counter()
 
         dt = t1 - t0

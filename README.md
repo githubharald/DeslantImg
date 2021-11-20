@@ -6,7 +6,7 @@ This algorithm sets handwritten text in images upright, i.e. it removes the curs
 One can use it as a preprocessing step for handwritten text recognition.
 The following illustration shows input and output of the algorithm for a given image (`data/test1.png`).
 
-![deslanting](doc/deslanting.png)
+![deslanting](doc/example.png)
 
 Three implementations are provided:
 * Python
@@ -19,9 +19,9 @@ Three implementations are provided:
 ### Python
 
 * Install by running `pip install .`
-* Run `deslant` (without arguments) from the command line to process the images in the `data` directory (images taken from IAM and Bentham dataset)
+* Run `deslant_img` (without arguments) from the command line to process the images in the `data` directory (images taken from IAM and Bentham dataset)
 * This opens a window showing the input image, deslanted image and score values
-* The script can be configured via command line, see available options [below](#python-gui), or by running `deslant -h`
+* The script can be configured via command line, see available options [below](#python-gui), or by running `deslant_img -h`
 
 ![plot](doc/plot.png)
 
@@ -51,7 +51,7 @@ Some notes on how to compile the demo manually and how to compile for Windows or
 
 Command line options of `deslant`:
 ```
-usage: deslant [-h] [--data DATA] [--optim_algo {grid,powell}]
+usage: deslant_img [-h] [--data DATA] [--optim_algo {grid,powell}]
                [--lower_bound LO] [--upper_bound HI]
                [--num_steps STEPS] [--bg_color BG]
 
@@ -70,7 +70,21 @@ optional arguments:
 ```
 
 ### Python API
-TODO
+
+* Import the `deslant_img` function as shown in the code snippet
+* For documentation of parameters see command line parameters above or use `help(deslant_img)`
+
+````python
+from deslant_img import deslant_img
+import cv2
+import matplotlib.pyplot as plt
+
+img = cv2.imread('data/test1.png', cv2.IMREAD_GRAYSCALE)
+res = deslant_img(img)
+
+plt.imshow(res.img)
+plt.show()
+````
 
 ### C++ CLI
 
