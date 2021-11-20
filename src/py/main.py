@@ -20,12 +20,18 @@ def get_img_files(data_dir: Path) -> List[Path]:
 def parse_args():
     """Parses command line args."""
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data', type=Path, default=Path('../../data/'))
-    parser.add_argument('--optim_algo', choices=['grid', 'powell'], default='grid')
-    parser.add_argument('--lower_bound', type=float, default=-2)
-    parser.add_argument('--upper_bound', type=float, default=2)
-    parser.add_argument('--num_steps', type=float, default=20)
-    parser.add_argument('--bg_color', type=int, default=255)
+    parser.add_argument('--data', type=Path, default=Path('../../data/'),
+                        help='directory containing the (.png|.jpg|.bmp) input images')
+    parser.add_argument('--optim_algo', choices=['grid', 'powell'], default='grid',
+                        help='either do grid search, or apply Powell\'s derivative-free optimizer')
+    parser.add_argument('--lower_bound', type=float, default=-2, metavar='LO',
+                        help='lower bound of shear values')
+    parser.add_argument('--upper_bound', type=float, default=2, metavar='HI',
+                        help='upper bound of shear values')
+    parser.add_argument('--num_steps', type=float, default=20, metavar='STEPS',
+                        help='if grid search is used, this argument defines the number if grid points')
+    parser.add_argument('--bg_color', type=int, default=255, metavar='BG',
+                        help='color to fill the gaps of the sheared image that is returned')
 
     return parser.parse_args()
 

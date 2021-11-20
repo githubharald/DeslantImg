@@ -22,7 +22,7 @@ namespace htr
 	// * img: grayscale image containing text
 	// * bgcolor: empty space in result image is filled with this color (0...255)
 	// * returns: deslanted image
-	cv::Mat deslantImg(const cv::Mat& img, const int bgcolor)
+	cv::Mat deslantImg(const cv::Mat& img, const int bgcolor, const float lower_bound, const float upper_bound)
 	{
 		// must be grayscale img
 		assert(img.channels() == 1);
@@ -44,6 +44,10 @@ namespace htr
 			Result result;
 
 			const float alpha = alphaVals[i];
+			if (alpha < lower_bound)
+				continue;
+			if (alpha > upper_bound)
+				break;
 			const float shiftX = std::max(-alpha*imgBW.rows, 0.0f);
 			result.size = cv::Size(imgBW.cols + static_cast<int>(std::ceil(std::abs(alpha*imgBW.rows))), imgBW.rows);
 
