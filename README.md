@@ -25,7 +25,7 @@ and OpenCL see the folder [extras](extras).
 
 ## Usage
 
-Command line options of `deslant`:
+Command line options of `deslant_img`:
 
 ```
 usage: deslant_img [-h] [--data DATA] [--optim_algo {grid,powell}]

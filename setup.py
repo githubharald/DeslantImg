@@ -5,10 +5,10 @@ Installs:
 
 import codecs
 
+from setuptools import setup
+
 with codecs.open('README.md', encoding='utf-8') as f:
     README = f.read()
-
-from setuptools import setup
 
 setup(
     name='deslant-img',
@@ -20,5 +20,7 @@ setup(
     author='Harald Scheidl',
     packages=['deslant_img'],
     install_requires=open('requirements.txt').read().split('\n'),
-    scripts=['scripts/deslant_img.py'],
+    entry_points={
+        'console_scripts': ['deslant_img=deslant_img.cli:main'],
+    }
 )
