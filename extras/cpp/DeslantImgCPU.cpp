@@ -29,7 +29,7 @@ namespace htr
 
 		// calc binary img
 		cv::Mat imgBW;
-		cv::threshold(img, imgBW, 0, 255, CV_THRESH_BINARY_INV | CV_THRESH_OTSU);
+		cv::threshold(img, imgBW, 0, 255, cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
 
 		// list of alpha values controlling shear transform (search space)
 		std::vector<float> alphaVals = { -1.0, -0.75, -0.5, -0.25, 0.0, 0.25, 0.5, 0.75, 1.0 };
