@@ -14,11 +14,12 @@ and OpenCL see the folder [extras](extras).
 
 ## Installation
 
+* Go to the root level of the repository
 * Install by running `pip install .`
 * Run `deslant_img` (without arguments) from the command line to process the images in the `data` directory (images
   taken from IAM and Bentham dataset)
 * This opens a window showing the input image, deslanted image and score values
-* The script can be configured via command line, see available options [below](#python-gui), or by
+* The script can be configured via command line, see available options below, or by
   running `deslant_img -h`
 
 ![plot](doc/plot.png)
@@ -29,8 +30,8 @@ Command line options of `deslant_img`:
 
 ```
 usage: deslant_img [-h] [--data DATA] [--optim_algo {grid,powell}]
-               [--lower_bound LO] [--upper_bound HI]
-               [--num_steps STEPS] [--bg_color BG]
+                   [--lower_bound LO] [--upper_bound HI]
+                   [--num_steps STEPS] [--bg_color BG]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -52,7 +53,7 @@ optional arguments:
 * For documentation of parameters see command line parameters above or use `help(deslant_img)`
 
 ````python
-from deslant_img.__init__ import deslant_img
+from deslant_img import deslant_img
 import cv2
 import matplotlib.pyplot as plt
 
