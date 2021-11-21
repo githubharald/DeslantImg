@@ -5,25 +5,20 @@ Installs:
 
 import codecs
 
-from setuptools import setup
-
 with codecs.open('README.md', encoding='utf-8') as f:
     README = f.read()
+
+from setuptools import setup
 
 setup(
     name='deslant-img',
     description='The deslanting algorithm sets text upright in images',
     long_description=README,
     long_description_content_type='text/markdown',
-    author='Harald Scheidl',
+    version='1.0.0',
     url='https://github.com/githubharald/DeslantImg',
-    license='MIT',
-    py_modules=['deslant_img_cli_script', 'deslant_img'],
-    package_dir={'': 'src/py'},
+    author='Harald Scheidl',
+    packages=['deslant_img'],
     install_requires=open('requirements.txt').read().split('\n'),
-    entry_points={
-        'console_scripts': [
-            'deslant_img=deslant_img_cli_script:main'
-        ]
-    }
+    scripts=['scripts/deslant_img.py'],
 )

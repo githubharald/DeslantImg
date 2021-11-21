@@ -6,7 +6,7 @@ import cv2
 import matplotlib.pyplot as plt
 from path import Path
 
-from deslant_img import deslant_img
+from __init__ import deslant_img
 
 
 def get_img_files(data_dir: Path) -> List[Path]:

@@ -2,14 +2,14 @@
 CXX = g++
 CXXFLAGS = -g -Wall -std=c++11
 LDLIBS = $(shell pkg-config --cflags --libs opencv)
-VPATH = src/cpp
+VPATH = cpp
 
 DeslantImg: main.o
 	$(CXX) $(LDFLAGS) $^ $(LOADLIBES) $(LDLIBS) -o $@
 
 ifeq (1,$(GPU))
 $(info Compiling for GPU using OpenCL.)
-VPATH += src/cl
+VPATH += cl
 LDLIBS += -lOpenCL
 CXXFLAGS += -DUSE_GPU
 
