@@ -3,7 +3,7 @@
 ## Build
 
 * Use `./build.sh` to build the CPU version, or `./build.sh gpu` to build the GPU version on Linux using g++  
-  Alternatively, use `make` to build the CPU version, or `make GPU=1` to build to GPU version.
+* Alternatively, use `make` to build the CPU version, or `make GPU=1` to build to GPU version.
 * Run `./DeslantImg` to process the images in the `data/` directory
 * Two processed images are saved in the repositories root directory
 
@@ -17,6 +17,7 @@ Some notes on how to compile the demo manually and how to compile for Windows or
 
         g++ --std=c++11 -D USE_GPU src/cpp/main.cpp src/cpp/DeslantImgCPU.cpp src/cpp/DeslantImgGPU.cpp src/cpp/CLWrapper.cpp `pkg-config --cflags --libs opencv` -lOpenCL -o DeslantImg
 
+* With OpenCV4 it might be needed to specify `opencv4` instead of `opencv` with `pkg-config`
 * On Windows, the easiest way is to use Microsoft Visual Studio, put all files into a C++ project, set include and library paths for OpenCV and optionally OpenCL, and finally compile and run the program
 
 ## Run
@@ -76,4 +77,3 @@ const cv::Mat res = htr::deslantImg(img, 255, clWrapper);
 // and save the result
 cv::imwrite("out1.png", res);
 ```
-
